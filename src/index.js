@@ -1,17 +1,47 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState } from 'react';
+import ReactDOM from "react-dom/client";
+import SeasonDisplay from './SeasonDisplay';
+import Spinner from './Spinner';
+import Err from './Err';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+
+class App extends React.Component {
+
+    state={lat:null,weather:'',lon:null,errorMessage:'',apiKey:"2f724f10fd4d5a2f2745607ee3bbf7cc"};
+
+    componentDidMount(){
+        window.navigator.geolocation.getCurrentPosition(
+            (position) =>{ this.setState({lat: position.coords.latitude, lon: position.coords.longitude})},
+            (err) => this.setState({errorMessage: err.message})
+        );
+        
+    }
+
+
+    renderContent(){
+        if(this.state.lat===null&&this.state.errorMessage===''){
+            return <Spinner message="Please accept location request"/>;
+        }
+        if(this.state.lat==null){
+            return <Err message={this.state.errorMessage}/>;
+        }
+        return <SeasonDisplay lat={this.state.lat}/>;
+    }
+
+    render(){
+        return(
+            <div>
+                {this.renderContent()}
+                <h1>Hello</h1>
+            </div>
+            
+        );
+    }
+}
+
+const container = document.getElementById('root');
+const root=ReactDOM.createRoot(container);
+root.render(<App />);
+
+
